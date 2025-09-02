@@ -1,89 +1,96 @@
 // Lab: Abstraction with Go (Car Example)
 // --------------------------------------
-// This lab demonstrates abstraction via the Car interface.
-// Each concrete type (Sedan, Pickup, EV) implements the same
-// behaviors defined by the interface, allowing polymorphic use.
+// ตัวอย่างนี้สาธิตการใช้งาน Abstraction ผ่าน Interface ชื่อ Car
+// โดยมีรถหลายประเภท (Sedan, Pickup, EV) ที่ implements เมธอดเดียวกัน
 //
-// Run:
+// รันโปรแกรม:
 //   go run main.go
 //
-// Author: You 🧑‍💻
+// ผู้เขียน: You 🧑‍💻
 package main
 
 import "fmt"
 
-// Car is the abstraction (interface) that defines common behaviors.
+// Car คือ interface ที่เป็นนามธรรมของ "รถ"
+// ทุก struct ที่จะถือว่าเป็นรถ ต้องมีเมธอด Drive() และ Info()
 type Car interface {
-    Drive()              // behavior when the car is driven
-    Info() string        // formatted car info
+	Drive()       // เมธอดสำหรับแสดงพฤติกรรมการขับรถ
+	Info() string // เมธอดสำหรับคืนค่าข้อมูลรถ
 }
 
-// Sedan represents a passenger car.
+// -------------------- Sedan --------------------
+// Sedan คือ struct ที่แทนรถเก๋ง
 type Sedan struct {
-    Brand string
-    Model string
-    Color string
+	Brand string
+	Model string
+	Color string
 }
 
+// implements เมธอด Drive() ของ Car
 func (s Sedan) Drive() {
-    fmt.Println("Driving sedan ->", s.Brand, s.Model, "Color:", s.Color)
+	fmt.Println("ขับรถเก๋ง ->", s.Brand, s.Model, "สี:", s.Color)
 }
 
+// implements เมธอด Info() ของ Car
 func (s Sedan) Info() string {
-    return fmt.Sprintf("Sedan(%s %s, %s)", s.Brand, s.Model, s.Color)
+	return fmt.Sprintf("Sedan(%s %s, %s)", s.Brand, s.Model, s.Color)
 }
 
-// Pickup represents a pickup truck.
+// -------------------- Pickup --------------------
+// Pickup คือ struct ที่แทนรถกระบะ
 type Pickup struct {
-    Brand   string
-    Payload int // kg
-    FourWD  bool
+	Brand   string
+	Payload int  // น้ำหนักบรรทุกสูงสุด (kg)
+	FourWD  bool // มีระบบขับเคลื่อน 4 ล้อหรือไม่
 }
 
 func (p Pickup) Drive() {
-    mode := "2WD"
-    if p.FourWD {
-        mode = "4WD"
-    }
-    fmt.Println("Driving pickup ->", p.Brand, "Payload:", p.Payload, "kg", "| Mode:", mode)
+	mode := "2WD"
+	if p.FourWD {
+		mode = "4WD"
+	}
+	fmt.Println("ขับรถกระบะ ->", p.Brand, "บรรทุกได้:", p.Payload, "kg", "| โหมด:", mode)
 }
 
 func (p Pickup) Info() string {
-    return fmt.Sprintf("Pickup(%s, %dkg, FourWD:%t)", p.Brand, p.Payload, p.FourWD)
+	return fmt.Sprintf("Pickup(%s, %dkg, FourWD:%t)", p.Brand, p.Payload, p.FourWD)
 }
 
-// EV represents an electric vehicle.
+// -------------------- EV --------------------
+// EV คือ struct ที่แทนรถยนต์ไฟฟ้า
 type EV struct {
-    Brand    string
-    Battery  int // kWh
-    RangeKM  int // km per charge
-    FastCharge bool
+	Brand      string
+	Battery    int  // ความจุแบตเตอรี่ (kWh)
+	RangeKM    int  // ระยะทางที่วิ่งได้ต่อการชาร์จ (km)
+	FastCharge bool // รองรับชาร์จเร็วหรือไม่
 }
 
 func (e EV) Drive() {
-    fc := "Standard charge"
-    if e.FastCharge {
-        fc = "Fast charge ready"
-    }
-    fmt.Println("Driving EV ->", e.Brand, "| Battery:", e.Battery, "kWh | Range:", e.RangeKM, "km |", fc)
+	fc := "ชาร์จปกติ"
+	if e.FastCharge {
+		fc = "รองรับชาร์จเร็ว"
+	}
+	fmt.Println("ขับรถไฟฟ้า ->", e.Brand, "| แบตเตอรี่:", e.Battery, "kWh | ระยะทาง:", e.RangeKM, "km |", fc)
 }
 
 func (e EV) Info() string {
-    return fmt.Sprintf("EV(%s, %dkWh, %dkm, FastCharge:%t)", e.Brand, e.Battery, e.RangeKM, e.FastCharge)
+	return fmt.Sprintf("EV(%s, %dkWh, %dkm, FastCharge:%t)", e.Brand, e.Battery, e.RangeKM, e.FastCharge)
 }
 
+// -------------------- main --------------------
 func main() {
-    // Create concrete cars
-    sedan := Sedan{Brand: "Toyota", Model: "Camry", Color: "Black"}
-    pickup := Pickup{Brand: "Isuzu", Payload: 1000, FourWD: true}
-    ev := EV{Brand: "Tesla", Battery: 75, RangeKM: 500, FastCharge: true}
+	// สร้าง object ของรถแต่ละประเภท
+	sedan := Sedan{Brand: "Toyota", Model: "Camry", Color: "ดำ"}
+	pickup := Pickup{Brand: "Isuzu", Payload: 1000, FourWD: true}
+	ev := EV{Brand: "Tesla", Battery: 75, RangeKM: 500, FastCharge: true}
 
-    // Use abstraction via the Car interface
-    cars := []Car{sedan, pickup, ev}
+	// ใช้งาน abstraction ผ่าน interface Car
+	cars := []Car{sedan, pickup, ev}
 
-    for _, car := range cars {
-        fmt.Println(car.Info())
-        car.Drive()
-        fmt.Println("---")
-    }
+	// วนลูปเรียกใช้งาน โดยไม่สนใจว่ารถเป็นชนิดใด
+	for _, car := range cars {
+		fmt.Println(car.Info())
+		car.Drive()
+		fmt.Println("---")
+	}
 }
